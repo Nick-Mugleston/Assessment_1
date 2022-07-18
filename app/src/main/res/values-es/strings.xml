@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Evaluación 1</string>
+    <string name="search_news">Buscar noticias</string>
+    <string name="search">Búsqueda</string>
+    <string name="temp">Temp</string>
+</resources>
