@@ -11,14 +11,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class FetchNews extends AsyncTask<String, Void, String> {
 
     //Labels logcat output for easy filtering
     private static final String TAG = FetchNews.class.getSimpleName();
 
-    Article[] articles;
+    List<Article> articles;
     MainActivity mainActivity;
 
     public FetchNews(MainActivity ma) {
@@ -43,12 +45,9 @@ public class FetchNews extends AsyncTask<String, Void, String> {
             //Looks for items contained under the "articles" section
             JSONArray itemsArray = jsonObject.getJSONArray("articles");
 
-            //Max 20 articles loaded into the app
-            int cap = Math.min(itemsArray.length(),20);
-            articles = new Article[cap];
-            //If any articles are parsed but have problems, we exclude them from the array
-            //and use misses to show how many spaces we skipped to account for indexing
-            int misses = 0;
+            //Max 2 articles loaded into the app - to limit excessive strain while testing the database
+            int cap = Math.min(itemsArray.length(),2);
+            articles = new ArrayList<Article>();
 
             for(int i = 0; i < cap; i++) {
                 try {
@@ -59,13 +58,9 @@ public class FetchNews extends AsyncTask<String, Void, String> {
                     String description = article.getString("description");
                     String url = article.getString("url");
 
-                    //if there is not a problem, put it in the articles array
-                    //i-misses places articles at the end adjusted for items we do not include
-                    //otherwise, there would be null items in the middle of our array
+                    //if there is not a problem, put it in the articles list
                     if(title != null && author != null && description != null && url != null && !title.isEmpty() && !author.isEmpty() && !description.isEmpty() && !url.isEmpty()) {
-                        articles[i-misses] = new Article(title,author,description,url);
-                    } else {
-                        misses++;
+                        articles.add(new Article(title,author,description,url));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -74,6 +69,7 @@ public class FetchNews extends AsyncTask<String, Void, String> {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mainActivity.fillRecyclerView(articles);
+        Log.i(TAG, articles.toString());
+        mainActivity.saveData(articles);
     }
 }
